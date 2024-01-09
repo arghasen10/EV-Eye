@@ -41,13 +41,12 @@ def train_net(
     train_label = (train_label.T).reshape(-1, 260, 346)
     print("train_data.shape", train_data.shape)
     print("train_label.shape", train_label.shape)
-    for_train_data = train_data[:int(len(train_data)*0.7)]
-    for_train_label = train_label[:int(len(train_data)*0.7)]
-    test_data = train_data[int(len(train_data)*0.7):]
-    test_label = train_label[int(len(train_data)*0.7):]
+    combined_dataset = Data.TensorDataset((torch.from_numpy(train_data).type(torch.FloatTensor) / 255),
+                                        torch.div(torch.from_numpy(train_label).type(torch.LongTensor), 1))
 
-    trainDataset = Data.TensorDataset((torch.from_numpy(for_train_data).type(torch.FloatTensor) / 255),
-                                        torch.div(torch.from_numpy(for_train_label).type(torch.LongTensor), 1))
+    train_size = int(0.7 * len(combined_dataset))
+    val_size = len(combined_dataset) - train_size
+    trainDataset, testDataset = torch.utils.data.random_split(combined_dataset, [train_size, val_size])
 
     n_train = len(trainDataset)
     print(n_train)
@@ -59,8 +58,6 @@ def train_net(
         # pin_memory=True
     )
 
-    testDataset = Data.TensorDataset((torch.from_numpy(test_data).type(torch.FloatTensor) / 255),
-                                        torch.div(torch.from_numpy(test_label).type(torch.LongTensor), 1))
     n_val = len(testDataset)
     val_loader = torch.utils.data.DataLoader(
         testDataset,
