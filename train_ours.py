@@ -5,6 +5,7 @@ import os
 import sys
 import h5py
 import torch
+torch.manual_seed(0)
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import optim
@@ -18,7 +19,7 @@ import glob
 
 def train_net(
         device,
-        epochs: int = 5,
+        epochs: int = 1,
         batch_size: int = 1,
         amp: bool = False
 ):
@@ -126,7 +127,8 @@ def train_net(
 
                         logging.info('Validation Dice score: {}'.format(val_score))
     
-    os.makedirs("checkpoints")
+    if not os.path.exists("checkpoints"):
+        os.makedirs("checkpoints")
     with open(os.path.join("checkpoints/", "result.txt"), 'w') as outfiletotal:
         outfiletotal.write("dice_score:" + str(val_score.cpu().numpy()) + ",miou_score:" + str(miou) + "\n")
         sys.stdout.flush()
@@ -137,7 +139,7 @@ def train_net(
     
 def get_args():
     parser = argparse.ArgumentParser(description='Train the UNet on images and target masks')
-    parser.add_argument('--epochs', '-e', metavar='E', type=int, default=5, help='Number of epochs')
+    parser.add_argument('--epochs', '-e', metavar='E', type=int, default=1, help='Number of epochs')
     parser.add_argument('--batch-size', '-b', dest='batch_size', metavar='B', type=int, default=8, help='Batch size')
     parser.add_argument('--amp', action='store_true', default=False, help='Use mixed precision')
     return parser.parse_args()
