@@ -24,6 +24,7 @@ def generate_mask(filename):
         label_grp = hf.create_group("label")
         for frame in frames:
             img = cv.imread(frame)
+            img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
             mask = np.zeros((260,346), dtype=np.uint8)
             frame_number=int(frame.split("_")[-1].split(".")[0])
             ellipse = get_ellipse_data_by_frame(frame_number, ellipse_data=ellipse_data)
