@@ -125,6 +125,14 @@ def train_net(
                         scheduler.step(val_score)
 
                         logging.info('Validation Dice score: {}'.format(val_score))
+    
+    os.makedirs("checkpoints")
+    with open(os.path.join("checkpoints/", "result.txt"), 'w') as outfiletotal:
+        outfiletotal.write("dice_score:" + str(val_score.cpu().numpy()) + ",miou_score:" + str(miou) + "\n")
+        sys.stdout.flush()
+        outfiletotal.flush()
+        torch.save(net.state_dict(), os.path.join(str("checkpoints"), "test.pth"))
+        logging.info(f'Checkpoint {epoch} saved!')
 
     
 def get_args():
@@ -150,6 +158,5 @@ if __name__ == '__main__':
             amp=args.amp,
         )
     except KeyboardInterrupt:
-        torch.save(net.state_dict(), 'INTERRUPTED.pth')
-        logging.info('Saved interrupt')
+        logging.info('Interrupt')
         raise
