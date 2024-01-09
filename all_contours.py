@@ -2,6 +2,7 @@ import dv_processing as dv
 import cv2 as cv
 import numpy as np
 import json
+import os
 
 def meets_criteria(contour, area_threshold_min, area_threshold_max, axis_ratio_threshold_min, axis_ratio_threshold_max):
     try:
@@ -21,23 +22,22 @@ def meets_criteria(contour, area_threshold_min, area_threshold_max, axis_ratio_t
 
 
 # Open a file
-reader = dv.io.MonoCameraRecording("eye_dataset/dvSave-2024_01_07_21_35_28.aedat4")
+filename = "eye_dataset/dvSave-2024_01_07_21_35_28.aedat4"
+hash = filename.split("/")[-1].split(".")[0].split("-")[-1]
+reader = dv.io.MonoCameraRecording(filename)
 
 flag = False
-
+output_directory = "eye_dataset/gt_data"
 
 # Variable to store the previous frame timestamp for correct playback
 lastTimestamp = None
 frame_no = 0
 
-# Initialize variables for Kalman filter
-last_measurement = None
-last_prediction = None
-
-
+ellipse_data = []
 
 # Run the loop while camera is still connected
 while reader.isRunning():
+    frame_no+=1
     # if flag == False:
     #     flag = True
     #     fourcc = cv.VideoWriter_fourcc(*'h264')
@@ -70,7 +70,13 @@ while reader.isRunning():
                 cv.ellipse(img, ellipse, (255,0, 255), 1, cv.LINE_AA)
                 (x, y), (w, h), _ = ellipse
                 cv.imshow("Frame", img)
-                cv.waitKey(0)
+                key = cv.waitKey(0)
+                if key == ord('s'):
+                    output_path = os.path.join(output_directory, f"saved_frame_{hash}_{frame_no}.png")
+                    print("ellipse", ellipse)
+                    cv.imwrite(output_path, original_img)
+                    print('Saved Image')
+                    ellipse_data.append({f"frame_{frame_no}": ellipse})
                 img = original_img.copy()
             except:
                 print("Ignore")
@@ -81,8 +87,12 @@ while reader.isRunning():
         # cv.imshow("Frame", img)
         # Perform the sleep
         # cv.waitKey(int(delay))
-
+        # key = cv.waitKey(0) & 0xFF
+        # if key == ord('q'):
+        #     break
         # Store timestamp for the next frame
         lastTimestamp = frame.timestamp
 
 # output_video.release()
+with open(os.path.join(output_directory, f"ellipse_data_{hash}.json"), 'w') as json_file:
+    json.dump(ellipse_data, json_file)
