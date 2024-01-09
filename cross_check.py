@@ -9,7 +9,7 @@ def get_ellipse_data_by_frame(frame_number, ellipse_data):
                 return value
     return None
 
-filename = "eye_dataset/dvSave-2023_12_20_14_24_47.aedat4"
+filename = "eye_dataset/dvSave-2024_01_08_20_18_27.aedat4"
 hash = filename.split("/")[-1].split(".")[0].split("-")[-1]
 with open(f"eye_dataset/gt_data/ellipse_data_{hash}.json", 'r') as json_file:
     ellipse_data = json.load(json_file)

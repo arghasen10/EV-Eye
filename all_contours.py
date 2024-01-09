@@ -4,25 +4,8 @@ import numpy as np
 import json
 import os
 
-def meets_criteria(contour, area_threshold_min, area_threshold_max, axis_ratio_threshold_min, axis_ratio_threshold_max):
-    try:
-        x_min, x_max, y_min, y_max, width_min, width_max, height_min, height_max = 111, 200, 59, 117, 6, 38, 7, 47
-        ellipse = cv.fitEllipse(contour)
-        (a, b) = ellipse[1]
-        x, y, w, h = cv.boundingRect(contour)
-        axis_ratio = max(a, b) / min(a, b)
-        area = cv.contourArea(contour)
-        if (x_min < x < x_max) and (y_min < y < y_max) and (width_min < w < width_max) and (height_min < h < height_max) and (area_threshold_min < area < area_threshold_max) and (axis_ratio_threshold_min < axis_ratio < axis_ratio_threshold_max):
-            return True
-        else:
-            return False
-        # return (area_threshold_min < area < area_threshold_max) and (axis_ratio_threshold_min < axis_ratio < axis_ratio_threshold_max)
-    except:
-        return False
-
-
 # Open a file
-filename = "eye_dataset/dvSave-2024_01_07_21_35_28.aedat4"
+filename = "eye_dataset/dvSave-2024_01_08_20_18_27.aedat4"
 hash = filename.split("/")[-1].split(".")[0].split("-")[-1]
 reader = dv.io.MonoCameraRecording(filename)
 
