@@ -1,6 +1,6 @@
 import json
-import dv_processing as dv
 import cv2 as cv
+import glob
 
 def get_ellipse_data_by_frame(frame_number, ellipse_data):
     for frame_ellipses in ellipse_data:
@@ -9,31 +9,17 @@ def get_ellipse_data_by_frame(frame_number, ellipse_data):
                 return value
     return None
 
-
-with open("eye_dataset/gt_data/ellipse_data_2024_01_07_21_35_28.json", 'r') as json_file:
+filename = "eye_dataset/dvSave-2023_12_20_14_24_47.aedat4"
+hash = filename.split("/")[-1].split(".")[0].split("-")[-1]
+with open(f"eye_dataset/gt_data/ellipse_data_{hash}.json", 'r') as json_file:
     ellipse_data = json.load(json_file)
 
-filename = "eye_dataset/dvSave-2024_01_07_21_35_28.aedat4"
-hash = filename.split("/")[-1].split(".")[0].split("-")[-1]
-reader = dv.io.MonoCameraRecording(filename)
-frame_no = 0
-while reader.isRunning():
-    frame = reader.getNextFrame()
-    frame_no+=1
-    if frame is not None:
-        img = frame.image
-        img = cv.rotate(img, cv.ROTATE_90_CLOCKWISE)
-        img = cv.rotate(img, cv.ROTATE_90_CLOCKWISE)
-        img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        original_img = img.copy()
-        ellipse = get_ellipse_data_by_frame(frame_no, ellipse_data)
-        if ellipse is not None:
-            cv.ellipse(img, get_ellipse_data_by_frame(frame_no, ellipse_data), (255,0, 255), 1, cv.LINE_AA)
-            cv.imshow("Frame", img)
-        else:
-            print("No ellipse found for this frame")
-            cv.imshow("Frame", img)
-        key = cv.waitKey(0)
-        img = original_img.copy()
+frames = glob.glob(f"eye_dataset/gt_data/saved_frame_{hash}_*.png")
+for frame in frames:
+    img = cv.imread(frame)
+    ellipse = get_ellipse_data_by_frame(frame_number=int(frame.split("_")[-1].split(".")[0]), ellipse_data=ellipse_data)
+    cv.ellipse(img, ellipse, (255,0, 255), 1, cv.LINE_AA)
+    cv.imshow("Frame", img)
+    key = cv.waitKey(0)
         
 cv.destroyAllWindows()
