@@ -5,7 +5,6 @@ import os
 import sys
 import h5py
 import torch
-torch.manual_seed(0)
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import optim
@@ -16,7 +15,8 @@ from evaluate import evaluate
 from unet import UNet
 import numpy as np
 import glob
-
+np.random.seed(0)
+torch.manual_seed(0)
 def train_net(
         device,
         epochs: int = 1,
