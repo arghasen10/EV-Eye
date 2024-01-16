@@ -48,7 +48,7 @@ visualizer.setNegativeColor(dv.visualization.colors.darkGrey())
 # Initialize a preview window
 # cv.namedWindow("Preview", cv.WINDOW_NORMAL)
 result = cv.VideoWriter('filename2.mp4', cv.VideoWriter_fourcc(*'mp4v'), 20, (260,346)) 
-
+frame_count = 0
 # Run the loop while the camera is still connected
 while reader.isRunning():
     # Read batch of events
@@ -80,12 +80,15 @@ while reader.isRunning():
             for p_circle in p_circles_list:
                 for n_circle in n_circles_list:
                     if are_circles_close(p_circle, n_circle, distance_threshold=50):
+                        frame_count+=1
                         print("Circles are close:", p_circle, n_circle)
-                        # cv.circle(frame, p_circle[:2], p_circle[2], (0,255,0),2)
-                        # cv.circle(frame, n_circle[:2], n_circle[2], (0,0,255),2)
-                        cv.circle(frame, (int((p_circle[0]+n_circle[0])/2), int((p_circle[1]+n_circle[1])/2)), 4, (0,0,255), 4)
+                        cv.circle(frame, p_circle[:2], p_circle[2], (0,255,0),2)
+                        cv.circle(frame, n_circle[:2], n_circle[2], (0,0,255),2)
+                        cv.circle(frame, (int((p_circle[0]+n_circle[0])/2), int((p_circle[1]+n_circle[1])/2)), 4, (255,0,0), 4)
                         result.write(frame) 
-                        # cv.imshow("circles", frame)
+                        cv.imshow("circles", frame)
+                        filename = f"images/{frame_count}.png"
+                        cv.imwrite(filename, frame)
                         cv.waitKey(1)
                         frame = og_img.copy()
 
