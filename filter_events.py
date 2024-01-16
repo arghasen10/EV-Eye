@@ -42,6 +42,8 @@ while reader.isRunning():
             # Show the accumulated image
             frame = cv.rotate(frame, cv.ROTATE_90_CLOCKWISE)
             frame = cv.rotate(frame, cv.ROTATE_90_CLOCKWISE)
+            og_frame = frame.copy()
+            og_frame2 = frame.copy()
             frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
             frame = cv.dilate(frame, kernel, iterations=1)
             edged = cv.Canny(frame, 10, 20)
@@ -65,25 +67,25 @@ while reader.isRunning():
                                 if i[1]/i[0] > 6:
                                     continue
                             # draw the outer circle
-                            cv.circle(circle_frame,(i[0],i[1]),i[2],(0,255,0),2)
+                            cv.circle(og_frame,(i[0],i[1]),i[2],(0,255,0),2)
                             # draw the center of the circle
-                            cv.circle(circle_frame,(i[0],i[1]),2,(0,0,255),3)
+                            cv.circle(og_frame,(i[0],i[1]),2,(0,0,255),3)
                             print("################### ", i)
                             
-                            cv.imshow("Preview", circle_frame)
-                            key = cv.waitKey(0)
+                            cv.imshow("Preview", og_frame)
+                            key = cv.waitKey(1)
 
                             
-                            # cv.imshow("Preview", circle_frame)
-                            key = cv.waitKey(0)
+                            # # cv.imshow("Preview", circle_frame)
+                            # key = cv.waitKey(0)
                             
-                            if key == ord('c'):
-                                with open("event_circles.txt", "a") as file:
-                                    file.write("c:"+str(i)+",")
-                            if key == ord('i'):
-                                with open("event_circles.txt", "a") as file:
-                                    file.write("i:"+str(i)+",")
-                            circle_frame = frame.copy() 
+                            # if key == ord('c'):
+                            #     with open("event_circles.txt", "a") as file:
+                            #         file.write("c:"+str(i)+",")
+                            # if key == ord('i'):
+                            #     with open("event_circles.txt", "a") as file:
+                            #         file.write("i:"+str(i)+",")
+                            og_frame = og_frame2.copy() 
                     frame = original_img.copy()
             # result = cv.bitwise_and(frame, frame, mask=mask)
             # kernel = np.ones((5, 5), np.uint8)
