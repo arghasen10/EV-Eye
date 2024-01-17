@@ -1,7 +1,5 @@
 import dv_processing as dv
 import cv2 as cv
-from datetime import datetime, timedelta
-from collections import deque
 import numpy as np
 
 def euclidean_distance(point1, point2):
@@ -17,16 +15,15 @@ visualizer.setNegativeColor(dv.visualization.colors.darkGrey())
 
 # Initialize a preview window
 cv.namedWindow("Preview", cv.WINDOW_NORMAL)
-queue = deque(maxlen=10)
 avg_coordinate = np.array([0, 0])
 
 # Run the loop while the camera is still connected
 frame_count = 0
 flag = 0
+kernel = np.ones((3, 3), np.uint8) 
 while reader.isRunning():
     # Read batch of events
     events = reader.getNextEventBatch()
-    kernel = np.ones((3, 3), np.uint8) 
 
     if events is not None:
         event_count = len(events)
