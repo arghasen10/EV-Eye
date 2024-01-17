@@ -7,14 +7,6 @@ import numpy as np
 def euclidean_distance(point1, point2):
     return np.sqrt(np.square(point2[0] - point1[0]) + np.square(point2[1] - point1[1]))
 
-def slicing_callback(events: dv.EventStore):
-    # Generate a preview frame
-    frame = visualizer.generateImage(events)
-
-    # Show the accumulated image
-    cv.imshow("Preview", frame)
-    cv.waitKey(0)
-
 filename = "eye_dataset/dvSave-2024_01_08_20_18_27.aedat4"
 # Open any camera
 reader = dv.io.MonoCameraRecording(filename)
@@ -27,9 +19,6 @@ visualizer.setNegativeColor(dv.visualization.colors.darkGrey())
 cv.namedWindow("Preview", cv.WINDOW_NORMAL)
 queue = deque(maxlen=10)
 avg_coordinate = np.array([0, 0])
-# Initialize a slicer
-slicer = dv.EventStreamSlicer()
-slicer.doEveryTimeInterval(timedelta(milliseconds=204.7), slicing_callback)
 
 # Run the loop while the camera is still connected
 frame_count = 0
@@ -77,7 +66,7 @@ while reader.isRunning():
                                 flag=1
                             distance = euclidean_distance(avg_coordinate, i[:2])
                             print("distance", distance)
-                            if distance < 30:
+                            if distance < 20:
                                 # Update average coordinate
                                 avg_coordinate = (avg_coordinate + i[:2]) / 2
                                 
@@ -89,25 +78,7 @@ while reader.isRunning():
                                 filename = f"images/{frame_count}.png"
                                 cv.imwrite(filename, og_frame)
                                 cv.imshow("Preview", og_frame)
-                                key = cv.waitKey(0)
-
-
-                            
-                            # # cv.imshow("Preview", circle_frame)
-                            key = cv.waitKey(0)
-                            
-                            # if key == ord('c'):
-                            #     with open("event_circles.txt", "a") as file:
-                            #         file.write("c:"+str(i)+",")
-                            # if key == ord('i'):
-                            #     with open("event_circles.txt", "a") as file:
-                            #         file.write("i:"+str(i)+",")
+                                key = cv.waitKey(1)
                             og_frame = og_frame2.copy() 
                     frame = original_img.copy()
-            # result = cv.bitwise_and(frame, frame, mask=mask)
-            # kernel = np.ones((5, 5), np.uint8)
-            # result = cv.morphologyEx(result, cv.MORPH_OPEN, kernel)
-
-            # cv.imshow("Preview", frame)
-            # cv.waitKey(1)
-
+           
