@@ -72,8 +72,6 @@ while reader.isRunning():
                                 # draw the center of the circle
                                 cv.circle(og_frame,(i[0],i[1]),2,(0,0,255),3)
                                 print("################### ", i)
-                                filename = f"images/{frame_count}.png"
-                                cv.imwrite(filename, og_frame)
                                 cv.imshow("Preview", og_frame)
                                 key = cv.waitKey(1)
                             og_frame = og_frame2.copy() 
