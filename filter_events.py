@@ -1,8 +1,11 @@
 import dv_processing as dv
 import cv2 as cv
 from datetime import datetime, timedelta
-import statistics
+from collections import deque
 import numpy as np
+
+def euclidean_distance(point1, point2):
+    return np.sqrt(np.square(point2[0] - point1[0]) + np.square(point2[1] - point1[1]))
 
 def slicing_callback(events: dv.EventStore):
     # Generate a preview frame
@@ -22,13 +25,15 @@ visualizer.setNegativeColor(dv.visualization.colors.darkGrey())
 
 # Initialize a preview window
 cv.namedWindow("Preview", cv.WINDOW_NORMAL)
-
+queue = deque(maxlen=10)
+avg_coordinate = np.array([0, 0])
 # Initialize a slicer
 slicer = dv.EventStreamSlicer()
 slicer.doEveryTimeInterval(timedelta(milliseconds=204.7), slicing_callback)
 
 # Run the loop while the camera is still connected
 frame_count = 0
+flag = 0
 while reader.isRunning():
     # Read batch of events
     events = reader.getNextEventBatch()
@@ -58,6 +63,7 @@ while reader.isRunning():
                     if circles is not None:
                         circles = np.uint16(np.around(circles))
                         for i in circles[0,:]:
+                            frame_count+=1
                             if (i[2] > 80) or (i[2] < 35):
                                 continue 
                             if i[0] > i[1]:
@@ -66,18 +72,29 @@ while reader.isRunning():
                             elif i[1] > i[0]:
                                 if i[1]/i[0] > 6:
                                     continue
-                            # draw the outer circle
-                            cv.circle(og_frame,(i[0],i[1]),i[2],(0,255,0),2)
-                            # draw the center of the circle
-                            cv.circle(og_frame,(i[0],i[1]),2,(0,0,255),3)
-                            print("################### ", i)
-                            
-                            cv.imshow("Preview", og_frame)
-                            key = cv.waitKey(1)
+                            if flag == 0:
+                                avg_coordinate = i[:2]
+                                flag=1
+                            distance = euclidean_distance(avg_coordinate, i[:2])
+                            print("distance", distance)
+                            if distance < 30:
+                                # Update average coordinate
+                                avg_coordinate = (avg_coordinate + i[:2]) / 2
+                                
+                                # draw the outer circle
+                                cv.circle(og_frame,(i[0],i[1]),i[2],(0,255,0),2)
+                                # draw the center of the circle
+                                cv.circle(og_frame,(i[0],i[1]),2,(0,0,255),3)
+                                print("################### ", i)
+                                filename = f"images/{frame_count}.png"
+                                cv.imwrite(filename, og_frame)
+                                cv.imshow("Preview", og_frame)
+                                key = cv.waitKey(0)
+
 
                             
                             # # cv.imshow("Preview", circle_frame)
-                            # key = cv.waitKey(0)
+                            key = cv.waitKey(0)
                             
                             # if key == ord('c'):
                             #     with open("event_circles.txt", "a") as file:
