@@ -32,6 +32,14 @@ kalman.processNoiseCov = np.array([[1, 0, 0, 0],
 cv.namedWindow("Preview", cv.WINDOW_NORMAL)
 avg_coordinate = np.array([0, 0])
 
+
+kalman = cv.KalmanFilter(4, 2)
+kalman.measurementMatrix = np.array([[1, 0, 0, 0], [0, 1, 0, 0]], dtype=np.float32)
+kalman.transitionMatrix = np.array([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 0, 1]], dtype=np.float32)
+kalman.processNoiseCov = 1e-4 * np.eye(4, dtype=np.float32)
+kalman.measurementNoiseCov = 1e-1 * np.eye(2, dtype=np.float32)
+
+
 # Run the loop while the camera is still connected
 frame_count = 0
 start_time = None
